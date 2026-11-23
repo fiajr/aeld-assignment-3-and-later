@@ -10,16 +10,17 @@
  *   either in invocation of the system() call, or if a non-zero return
  *   value was returned by the command issued in @param cmd.
  */
-bool do_system(const char *cmd) {
+bool do_system(const char *cmd)
+{
 
-  int ret = -1;
+	int ret = -1;
 
-  ret = system(cmd);
+	ret = system(cmd);
 
-  if (ret == 0)
-    return true;
-  else
-    return false;
+	if (ret == 0)
+		return true;
+	else
+		return false;
 }
 
 /**
@@ -38,37 +39,38 @@ bool do_system(const char *cmd) {
  * with the specified arguments.
  */
 
-bool do_exec(int count, ...) {
-  va_list args;
-  va_start(args, count);
-  char *command[count + 1];
-  int i;
-  for (i = 0; i < count; i++) {
-    command[i] = va_arg(args, char *);
-  }
-  command[count] = NULL;
-  // this line is to avoid a compile warning before your implementation is
-  // complete and may be removed
-  command[count] = command[count];
+bool do_exec(int count, ...)
+{
+	va_list args;
+	va_start(args, count);
+	char *command[count + 1];
+	int i;
+	for (i = 0; i < count; i++) {
+		command[i] = va_arg(args, char *);
+	}
+	command[count] = NULL;
+	// this line is to avoid a compile warning before your implementation is
+	// complete and may be removed
+	command[count] = command[count];
 
-  int child_status = 0;
+	int child_status = 0;
 
-  if (fork() == 0) {
-    // looking at man of execv, the function will return only in case
-    // of an error. So we return false
-    execv(command[0], command);
-    perror("execv");
-    _exit(EXIT_FAILURE);
-  }
+	if (fork() == 0) {
+		// looking at man of execv, the function will return only in
+		// case of an error. So we return false
+		execv(command[0], command);
+		perror("execv");
+		_exit(EXIT_FAILURE);
+	}
 
-  wait(&child_status);
+	wait(&child_status);
 
-  if (WIFEXITED(child_status) == 0)
-    return false;
+	if (WIFEXITED(child_status) == 0)
+		return false;
 
-  if (WEXITSTATUS(child_status) != 0)
-    return false;
-  return true;
+	if (WEXITSTATUS(child_status) != 0)
+		return false;
+	return true;
 }
 
 /**
@@ -76,41 +78,42 @@ bool do_exec(int count, ...) {
  *   This file will be closed at completion of the function call.
  * All other parameters, see do_exec above
  */
-bool do_exec_redirect(const char *outputfile, int count, ...) {
-  va_list args;
-  va_start(args, count);
-  char *command[count + 1];
-  int i;
-  for (i = 0; i < count; i++) {
-    command[i] = va_arg(args, char *);
-  }
-  command[count] = NULL;
-  // this line is to avoid a compile warning before your implementation is
-  // complete and may be removed
-  command[count] = command[count];
+bool do_exec_redirect(const char *outputfile, int count, ...)
+{
+	va_list args;
+	va_start(args, count);
+	char *command[count + 1];
+	int i;
+	for (i = 0; i < count; i++) {
+		command[i] = va_arg(args, char *);
+	}
+	command[count] = NULL;
+	// this line is to avoid a compile warning before your implementation is
+	// complete and may be removed
+	command[count] = command[count];
 
-  if (fork() == 0) {
-    // looking at man of execv, the function will return only in case
-    // of an error. So we return false
-    int fd = open(outputfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    dup2(fd, 1);
-    close(fd);
-    execv(command[0], command);
-    // from fork man example
-    perror("execv");
-    _exit(EXIT_FAILURE);
-  }
+	if (fork() == 0) {
+		// looking at man of execv, the function will return only in
+		// case of an error. So we return false
+		int fd = open(outputfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		dup2(fd, 1);
+		close(fd);
+		execv(command[0], command);
+		// from fork man example
+		perror("execv");
+		_exit(EXIT_FAILURE);
+	}
 
-  va_end(args);
+	va_end(args);
 
-  int child_status;
-  wait(&child_status);
+	int child_status;
+	wait(&child_status);
 
-  if (WIFEXITED(child_status) == 0)
-    return false;
+	if (WIFEXITED(child_status) == 0)
+		return false;
 
-  if (WEXITSTATUS(child_status) != 0)
-    return false;
+	if (WEXITSTATUS(child_status) != 0)
+		return false;
 
-  return true;
+	return true;
 }
