@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 
   tcp_server_addr.sin_family = AF_INET;
   tcp_server_addr.sin_port = htons(9000); // server port
-  tcp_server_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); // local-host
+  tcp_server_addr.sin_addr.s_addr = inet_addr("0.0.0.0"); // local-host
 
   memset(tcp_server_addr.sin_zero, '\0', sizeof tcp_server_addr.sin_zero);
 
