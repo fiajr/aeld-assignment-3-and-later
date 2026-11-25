@@ -1,10 +1,14 @@
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/socket.h>
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
+
 #include <signal.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -117,15 +121,39 @@ int main(int argc, char *argv[])
     file = fopen("/var/tmp/aesdsocketdata", "a+");
     
     size_t n;
-    char buffer[300000] = {0};
-	
-    while ((valread = read(newsocket, buffer, sizeof(buffer))) > 0)
+    size_t total_size = 0;
+
+    char *buffer = NULL;
+    char temp[1024];
+
+    printf("stratin receiving\n");
+
+    while ((valread = read(newsocket, temp, sizeof(temp))) > 0)
     {
-      if (memchr(buffer, '\n', valread))
-          break;
+            char *new_buf = realloc(buffer, total_size + valread);
+            if (!new_buf)
+            {
+                free(buffer);
+                perror("realloc");
+                return -1;
+            }
+	    
+
+            buffer = new_buf;
+
+            memcpy(buffer + total_size, temp, valread);	
+	    
+	    total_size = total_size + valread;
+
+
+            if (memchr(buffer, '\n', total_size))
+   	    {
+              break;
+   	    }
+
     }
 
-    fwrite(buffer, 1, valread, file);
+    fwrite(buffer, 1, total_size, file);
     fflush(file);
     
     fseek(file, 0, SEEK_SET);
@@ -134,7 +162,8 @@ int main(int argc, char *argv[])
     {
     	write(newsocket, buffer, n);
     }
-    
+
+    free(buffer);    
     fclose(file);
     close(newsocket);
   }
