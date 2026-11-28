@@ -6,7 +6,7 @@ CC=$(CROSS_COMPILE)gcc
 endif
 
 all:
-	$(CC) -o aesdsocket aesdsocket.c
+	$(CC)  -Wall -Wextra -Werror -o aesdsocket aesdsocket.c
 
 clean:
 	rm -f aesdsocket
