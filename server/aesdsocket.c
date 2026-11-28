@@ -198,36 +198,13 @@ int main(int argc, char *argv[])
               memcpy(buffer + total_size, temp, valread);	
 	      
 	      total_size = total_size + valread;
-	      if (memchr(buffer, '\n', total_size))
-              {
-                break;
-              }
-
+	    if (memchr(buffer, '\n', total_size))
+   	    {
+		    break;
+   	    }
     }
-char *newline;
-
-while ((newline = memchr(buffer, '\n', total_size)) != NULL)
-{
-    size_t packet_size =
-        (newline - buffer) + 1;
-
-    fwrite(buffer,
-           1,
-           packet_size,
-           file);
-
+        fwrite(buffer, 1, total_size, file);
     fflush(file);
-
-    total_size -= packet_size;
-
-    if (total_size > 0)
-    {
-        memmove(buffer,
-                buffer + packet_size,
-                total_size);
-    }
-}
-    
     fseek(file, 0, SEEK_SET);
     
    char sendbuf[1024];
